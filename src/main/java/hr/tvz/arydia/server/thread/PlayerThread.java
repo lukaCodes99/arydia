@@ -1,6 +1,12 @@
 package hr.tvz.arydia.server.thread;
 
+import hr.tvz.arydia.server.ClientApplication;
 import hr.tvz.arydia.server.model.GameState;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,13 +21,20 @@ public class PlayerThread {
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
+    private String gameChoice;
+    private String playerName;
 
 
-    public PlayerThread(Socket clientSocket) {
+    public PlayerThread(Socket clientSocket, String gameChoice, String playerName) {
         try {
+            this.gameChoice = gameChoice;
+            this.playerName = playerName;
             socket = clientSocket;
-            ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(gameChoice + "," + playerName);
+            oos.flush();
+            ois = new ObjectInputStream(socket.getInputStream());
+
         } catch (IOException e) {
             System.err.println("Error setting up connection: " + e.getMessage());
         }
@@ -35,8 +48,10 @@ public class PlayerThread {
                     while (socket.isConnected()) {
                         Object receivedObject = ois.readObject();
                         if (receivedObject instanceof GameState newGameState) {
+                            ClientApplication.gameState = newGameState;
                             gameState = newGameState;
                             System.out.println("Received game state: " + gameState);
+                            loadMainScreen();
                         } else {
                             System.out.println("Received unknown object: " + receivedObject);
                         }
@@ -46,6 +61,21 @@ public class PlayerThread {
                 }
             }
         }).start();
+    }
+
+    private void loadMainScreen() {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/hr/tvz/arydia/server/hello-view.fxml"));
+                Parent root = loader.load();
+                Stage stage = new Stage();
+                stage.setTitle("Arydia - " + playerName);
+                stage.setScene(new Scene(root, 800, 800));
+                stage.show();
+            } catch (IOException e) {
+                System.err.println("Error loading main screen: " + e.getMessage());
+            }
+        });
     }
 
     public void sendGameState(GameState gameState) {

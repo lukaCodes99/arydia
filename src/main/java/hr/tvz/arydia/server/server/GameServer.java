@@ -85,6 +85,7 @@ public class GameServer {
         @Override
         public void run() {
             try{
+                System.out.println("Player " + playerNumber + " connected.");
                 String firstContact = (String) ois.readObject();
                 String gameStateChoice = firstContact.split(",")[0];
                 String playerName = firstContact.split(",")[1];
@@ -160,6 +161,7 @@ public class GameServer {
 
     //TODO sljedeće bi trebalo napraviti da je while petlja i onda već mislim da bi mogao prijeći na klijenta koji će morati upisati ime i reći što želi, prije toga nema spajanja!
     //TODO vidjeti jel možda treba imena threadova da ih znamo razlikovati iako mislim da ne treba --- DONE napravljena 2 client handlera
+    //TODO KATASTROFA, NE PUNI SE DOBRO STATE!!!! PRAZNI SU CONTAINERI, TREBA VIDJETI PUNJENJE
 
     public static void main(String[] args){
         GameServer gameServer = new GameServer();
