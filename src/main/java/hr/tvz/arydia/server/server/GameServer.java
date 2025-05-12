@@ -159,9 +159,10 @@ public class GameServer {
         }
     }
 
-    //TODO sljedeće bi trebalo napraviti da je while petlja i onda već mislim da bi mogao prijeći na klijenta koji će morati upisati ime i reći što želi, prije toga nema spajanja!
+    //TODO sljedeće bi trebalo napraviti da je while petlja i onda već mislim da bi mogao prijeći na klijenta koji će morati upisati ime i reći što želi, prije toga nema spajanja! --done
     //TODO vidjeti jel možda treba imena threadova da ih znamo razlikovati iako mislim da ne treba --- DONE napravljena 2 client handlera
-    //TODO KATASTROFA, NE PUNI SE DOBRO STATE!!!! PRAZNI SU CONTAINERI, TREBA VIDJETI PUNJENJE
+    //TODO KATASTROFA, NE PUNI SE DOBRO STATE!!!! PRAZNI SU CONTAINERI, TREBA VIDJETI PUNJENJE --- DONE dobro se pune ali ne mogu se serijalizirati tako da se mora napraviti čitanje
+    //TODO povezati da klijen zna tko je on! player 1 ili player 2
 
     public static void main(String[] args){
         GameServer gameServer = new GameServer();

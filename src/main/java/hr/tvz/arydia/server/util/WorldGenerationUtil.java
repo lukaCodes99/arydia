@@ -1,6 +1,13 @@
 package hr.tvz.arydia.server.util;
 
 import hr.tvz.arydia.server.model.*;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.Random;
@@ -28,6 +35,7 @@ public class WorldGenerationUtil {
                 }
                 openWorld.setTile(i, j, new Tile(TileType.OPEN_WORLD, active));
                 active = !active;
+                System.out.println(openWorld.getTile(i,j).toString());
             }
         }
         openWorld.setTile(0,0,new Tile(TileType.EXPLORATION, true));
@@ -53,4 +61,29 @@ public class WorldGenerationUtil {
         return world;
     }
 
+    public static OpenWorld recreateTileUIAndSetPlayerText(OpenWorld openWorld, List<Player> players) {
+        OpenWorld newOpenWorld = new OpenWorld();
+        for (int i = 0; i < WORLD_SIZE; i++) {
+            for (int j = 0; j < WORLD_SIZE; j++) {
+
+                if(openWorld.getTile(i,j).isActive()) {
+                    newOpenWorld.setSpecialWorld(i,j, recreateSpecialWorld(openWorld.getSpecialWorld(i, j)));
+                }
+                newOpenWorld.setTile(i, j, new Tile(openWorld.getTile(i,j).getTileType(), openWorld.getTile(i,j).isActive()));
+
+                System.out.println(newOpenWorld.getTile(i,j).toString());
+            }
+        }
+        return newOpenWorld;
+    }
+
+    private static SpecialWorld recreateSpecialWorld(SpecialWorld specialWorld){
+        SpecialWorld newWorld = new SpecialWorld();
+        for (int i = 0; i < WORLD_SIZE; i++) {
+            for (int j = 0; j < WORLD_SIZE; j++) {
+                newWorld.setTile(i, j, new Tile(specialWorld.getTile(i,j).getTileType(), specialWorld.getTiles()[i][j].isActive()));
+            }
+        }
+        return newWorld;
+    }
 }

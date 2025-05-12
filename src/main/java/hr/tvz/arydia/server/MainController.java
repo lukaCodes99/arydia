@@ -2,6 +2,7 @@ package hr.tvz.arydia.server;
 
 import hr.tvz.arydia.server.model.OpenWorld;
 import hr.tvz.arydia.server.thread.PlayerOneServerThread;
+import hr.tvz.arydia.server.util.WorldGenerationUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -35,28 +36,25 @@ public class MainController {
 //            }
 //            ClientApplication.gameState.getPlayers().forEach(System.out::println);
 //        });
-        if (ClientApplication.gameState != null) {
-            Platform.runLater(() -> {
-                if (ClientApplication.gameState.getOpenWorld() != null) {
-                    OpenWorld openWorld = ClientApplication.gameState.getOpenWorld();
-                    for (int i = 0; i < WORLD_SIZE; i++) {
-                        for (int j = 0; j < WORLD_SIZE; j++) {
-                            Node container = openWorld.getTile(i, j).getContainer();
-                            if (container != null) {
-                                gameGrid.add(container, i, j);
-                            } else {
-                                System.out.println("Container is null at: i=" + i + ", j=" + j);
-                            }
-                        }
+
+        Platform.runLater(() -> {
+            if (ClientApplication.gameState.getOpenWorld() != null) {
+                OpenWorld openWorld = ClientApplication.gameState.getOpenWorld();
+
+                openWorld = WorldGenerationUtil.recreateTileUIAndSetPlayerText(openWorld, ClientApplication.gameState.getPlayers());
+                ClientApplication.gameState.setOpenWorld(openWorld);
+                for (int i = 0; i < WORLD_SIZE; i++) {
+                    for (int j = 0; j < WORLD_SIZE; j++) {
+                        gameGrid.add(openWorld.getTile(i, j).getContainer(), i, j);
                     }
-                    ClientApplication.gameState.getPlayers().forEach(System.out::println);
-                } else {
-                    System.out.println("Open world is null.");
                 }
-            });
-        } else {
-            System.out.println("Game state is null.");
-        }
+                ClientApplication.gameState.getPlayers().forEach(System.out::println);
+            } else {
+                System.out.println("Open world is null.");
+            }
+        });
+
+
     }
 
 }

@@ -43,7 +43,7 @@ public class Tile implements Serializable {
         this.text.setText(textContent);
     }
 
-    private void setRectangleColor() {
+    public void setRectangleColor() {
         rect.setStroke(Color.BLACK);
         rect.setStrokeWidth(2);
         if (active) {
@@ -82,5 +82,25 @@ public class Tile implements Serializable {
         setRectangleColor();
     }
 
+    @Override
+    public String toString() {
+        return "Tile{" +
+                "tileType=" + tileType +
+                ", active=" + active +
+                ", rect=" + rect +
+                ", text=" + text +
+                ", container=" + container +
+                '}';
+    }
 
+    public void refreshRectangleColor() {
+        setRectangleColor();
+    }
+
+
+    public void setTextField(Text text) {
+        this.text = text;
+        this.container.getChildren().removeIf(node -> node instanceof Text);
+        this.container.getChildren().add(text);
+    }
 }

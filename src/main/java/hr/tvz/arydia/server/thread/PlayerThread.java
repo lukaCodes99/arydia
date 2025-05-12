@@ -1,7 +1,9 @@
 package hr.tvz.arydia.server.thread;
 
 import hr.tvz.arydia.server.ClientApplication;
+import hr.tvz.arydia.server.model.CharacterType;
 import hr.tvz.arydia.server.model.GameState;
+import hr.tvz.arydia.server.model.Player;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 public class PlayerThread {
 
@@ -23,6 +26,7 @@ public class PlayerThread {
     private ObjectOutputStream oos;
     private String gameChoice;
     private String playerName;
+    private CharacterType whoAmI;
 
 
     public PlayerThread(Socket clientSocket, String gameChoice, String playerName) {
@@ -50,6 +54,7 @@ public class PlayerThread {
                         if (receivedObject instanceof GameState newGameState) {
                             ClientApplication.gameState = newGameState;
                             gameState = newGameState;
+                            setInitialWhoAmI(gameState.getPlayers());
                             System.out.println("Received game state: " + gameState);
                             loadMainScreen();
                         } else {
@@ -63,13 +68,22 @@ public class PlayerThread {
         }).start();
     }
 
+    private void setInitialWhoAmI(List<Player> players) {
+        for (Player player : players) {
+            if (player.getName().equals(playerName)) {
+                this.whoAmI = player.getPlayerType();
+                break;
+            }
+        }
+    }
+
     private void loadMainScreen() {
         Platform.runLater(() -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/hr/tvz/arydia/server/hello-view.fxml"));
                 Parent root = loader.load();
                 Stage stage = new Stage();
-                stage.setTitle("Arydia - " + playerName);
+                stage.setTitle("Arydia - "  + whoAmI + ": " + playerName);
                 stage.setScene(new Scene(root, 800, 800));
                 stage.show();
             } catch (IOException e) {

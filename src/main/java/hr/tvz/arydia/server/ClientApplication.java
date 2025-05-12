@@ -21,6 +21,7 @@ public class ClientApplication extends Application {
     public static GameState gameState;
     public static String playerName;
     public static String gameChoice;
+    private CharacterType whoAmI; //možda će trebat biti statički ali ćemo vidjeti
 //TODO obavetno napraviti close everyhing
     //TODO sada treba napraviti ekran koji će prije spajanja imati 2 gumba i poslati jedan brzinski usernme i hoće li novu ili staru igru
     //nakon toga server nam posluži igru i idemo dalje, video je https://www.youtube.com/watch?v=gLfuZrrfKes otprijlike 35. minuta
@@ -57,5 +58,17 @@ public class ClientApplication extends Application {
 //        playerThread.connectToServer();
 
         launch();
+    }
+
+    public void setWhoAmI(List<Player> players) {
+        for (Player player : players) {
+            if (player.getName().equals(playerName)) {
+                this.whoAmI = player.getPlayerType();
+                break;
+            }
+        }
+    }
+    public CharacterType getWhoAmI() {
+        return whoAmI;
     }
 }
