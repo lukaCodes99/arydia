@@ -22,6 +22,7 @@ public class ClientApplication extends Application {
     public static String playerName;
     public static String gameChoice;
     private CharacterType whoAmI; //možda će trebat biti statički ali ćemo vidjeti
+    private static Stage primaryStage;
 //TODO obavetno napraviti close everyhing
     //TODO sada treba napraviti ekran koji će prije spajanja imati 2 gumba i poslati jedan brzinski usernme i hoće li novu ili staru igru
     //nakon toga server nam posluži igru i idemo dalje, video je https://www.youtube.com/watch?v=gLfuZrrfKes otprijlike 35. minuta
@@ -32,6 +33,7 @@ public class ClientApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        primaryStage = stage;
         FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("welcome-screen.fxml"));
         //FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("hello-view.fxml"));
 
@@ -70,5 +72,11 @@ public class ClientApplication extends Application {
     }
     public CharacterType getWhoAmI() {
         return whoAmI;
+    }
+
+    public static void closeWelcomeScreen() {
+        if (primaryStage != null) {
+            primaryStage.close();
+        }
     }
 }

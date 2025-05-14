@@ -86,6 +86,7 @@ public class PlayerThread {
                 stage.setTitle("Arydia - "  + whoAmI + ": " + playerName);
                 stage.setScene(new Scene(root, 800, 800));
                 stage.show();
+                ClientApplication.closeWelcomeScreen();
             } catch (IOException e) {
                 System.err.println("Error loading main screen: " + e.getMessage());
             }

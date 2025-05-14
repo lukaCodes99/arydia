@@ -71,7 +71,16 @@ public class WorldGenerationUtil {
                 }
                 newOpenWorld.setTile(i, j, new Tile(openWorld.getTile(i,j).getTileType(), openWorld.getTile(i,j).isActive()));
 
-                System.out.println(newOpenWorld.getTile(i,j).toString());
+                //System.out.println(newOpenWorld.getTile(i,j).setText(););
+            }
+        }
+        for(Player player : players) {
+            int i = player.getOpenWorldLocation().getI();
+            int j = player.getOpenWorldLocation().getJ();
+            if(newOpenWorld.getTile(i,j).getText().getText().isEmpty())
+                newOpenWorld.getTile(i,j).setText(player.getName());
+            else {
+                newOpenWorld.getTile(i,j).setText(newOpenWorld.getTile(i,j).getText().getText() + "\n" + player.getName());
             }
         }
         return newOpenWorld;
