@@ -79,4 +79,7 @@ public class ClientApplication extends Application {
             primaryStage.close();
         }
     }
+    public String getPlayerName() {
+        return playerName;
+    }
 }

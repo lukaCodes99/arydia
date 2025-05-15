@@ -28,4 +28,23 @@ public class Player implements Serializable {
         player.setSpecialWorldLocation(new Location(0, 0));
         return player;
     }
+
+    public int getOpenWorldI(){
+        return openWorldLocation.getI();
+    }
+    public int getOpenWorldJ(){
+        return openWorldLocation.getJ();
+    }
+    public int getSpecialWorldI(){
+        return specialWorldLocation.getI();
+    }
+    public int getSpecialWorldJ(){
+        return specialWorldLocation.getJ();
+    }
+    public void setOpenWorldI(int i){
+        openWorldLocation.setI(i);
+    }
+    public void setOpenWorldJ(int j){
+        openWorldLocation.setJ(j);
+    }
 }

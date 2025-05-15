@@ -1,6 +1,7 @@
 package hr.tvz.arydia.server.thread;
 
 import hr.tvz.arydia.server.ClientApplication;
+import hr.tvz.arydia.server.MainController;
 import hr.tvz.arydia.server.model.CharacterType;
 import hr.tvz.arydia.server.model.GameState;
 import hr.tvz.arydia.server.model.Player;
@@ -27,6 +28,7 @@ public class PlayerThread {
     private String gameChoice;
     private String playerName;
     private CharacterType whoAmI;
+    private Player player;
 
 
     public PlayerThread(Socket clientSocket, String gameChoice, String playerName) {
@@ -45,25 +47,22 @@ public class PlayerThread {
     }
 //wittcode kaže da s obzirom da je blokirajuće najbolje je da napravimo novi thread tako da taj poseban thread kad se spoji čeka na promjene
     public void connectToServer() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (socket.isConnected()) {
-                        Object receivedObject = ois.readObject();
-                        if (receivedObject instanceof GameState newGameState) {
-                            ClientApplication.gameState = newGameState;
-                            gameState = newGameState;
-                            setInitialWhoAmI(gameState.getPlayers());
-                            System.out.println("Received game state: " + gameState);
-                            loadMainScreen();
-                        } else {
-                            System.out.println("Received unknown object: " + receivedObject);
-                        }
+        new Thread(() -> {
+            try {
+                while (socket.isConnected()) {
+                    Object receivedObject = ois.readObject();
+                    if (receivedObject instanceof GameState newGameState) {
+                        ClientApplication.gameState = newGameState;
+                        gameState = newGameState;
+                        setInitialWhoAmI(gameState.getPlayers());
+                        System.out.println("Received game state: " + gameState);
+                        loadMainScreen();
+                    } else {
+                        System.out.println("Received unknown object: " + receivedObject);
                     }
-                } catch (IOException | ClassNotFoundException e) {
-                    System.err.println("Error receiving data from server: " + e.getMessage());
                 }
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error receiving data from server: " + e.getMessage());
             }
         }).start();
     }
@@ -72,6 +71,7 @@ public class PlayerThread {
         for (Player player : players) {
             if (player.getName().equals(playerName)) {
                 this.whoAmI = player.getPlayerType();
+                this.player = player;
                 break;
             }
         }
@@ -81,7 +81,9 @@ public class PlayerThread {
         Platform.runLater(() -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/hr/tvz/arydia/server/hello-view.fxml"));
-                Parent root = loader.load();
+                Parent root = loader.load(); //  ovo uvijek treba prvo pozvati!!
+                MainController controller = loader.getController();
+                controller.setPlayer(player);//zbog servisa
                 Stage stage = new Stage();
                 stage.setTitle("Arydia - "  + whoAmI + ": " + playerName);
                 stage.setScene(new Scene(root, 800, 800));
