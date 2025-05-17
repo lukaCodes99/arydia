@@ -1,9 +1,6 @@
 package hr.tvz.arydia.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -14,6 +11,8 @@ import java.io.Serializable;
 public class Player implements Serializable {
 
     private String name;
+    @Setter
+    @Getter
     private CharacterType playerType;
     private Location openWorldLocation;
     private Location specialWorldLocation;
@@ -47,4 +46,5 @@ public class Player implements Serializable {
     public void setOpenWorldJ(int j){
         openWorldLocation.setJ(j);
     }
+
 }

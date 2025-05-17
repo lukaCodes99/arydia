@@ -32,7 +32,7 @@ public class MovementService {
             newTile.setText(player.getName());
         }
     }
-//tu su problem dijagonale
+//tu su problem dijagonale odnosno smije samo u pločice do trenutne
     private boolean checkMoveInvalidOpenWorld(int i, int j, int moveAbilityLevel) {
         //return !((i - player.getOpenWorldI() > moveAbilityLevel) || (j - player.getOpenWorldJ() <= moveAbilityLevel));
         //return !(((i - player.getOpenWorldI()) > moveAbilityLevel) || ((j - player.getOpenWorldJ()) <= moveAbilityLevel));
@@ -49,10 +49,14 @@ public class MovementService {
 
     public void moveToTileSpecialWorld(Tile[][] specialWorldGrid, int i, int j) {
         //int moveAbilityLevel = player.getMoveAbilityLevel();
-        if(!checkMoveValidSpecialWorld(i, j, specialWorldGrid)) {
-            DialogUtils.invalidMoveAlert("Invalid move, move exceeds your ability level");
+        if(checkMoveInvalidSpecialWorld(i, j, specialWorldGrid)) {
+            DialogUtils.invalidMoveAlert("Invalid move, move exceeds your ability level or tile inactive");
             throw new InvalidMoveException("Invalid move in special world");
         }
+        System.out.printf("player type: %s\n", player.getPlayerType());
+        System.out.println(player.getSpecialWorldI() +" "+ player.getSpecialWorldJ()
+        +" swl"+ player.getSpecialWorldLocation().toString()
+        +" openworld "+ player.getOpenWorldI()+" "+ player.getOpenWorldJ());
         if (player.getSpecialWorldI() != i || player.getSpecialWorldJ() != j) {
 
             Tile oldTile = specialWorldGrid[player.getSpecialWorldI()][player.getSpecialWorldJ()];
@@ -67,9 +71,12 @@ public class MovementService {
         }
     }
 
-    private boolean checkMoveValidSpecialWorld(int i, int j, Tile[][] specialWorldGrid) {
+    private boolean checkMoveInvalidSpecialWorld(int i, int j, Tile[][] specialWorldGrid) {
 
-        if (!specialWorldGrid[i][j].isActive()) return false;
+        if (!specialWorldGrid[i][j].isActive()) {
+            System.out.println(specialWorldGrid[i][j].isActive());
+            return false;
+        }
 
         int deltaX = Math.abs(i - player.getSpecialWorldI());
         int deltaY = Math.abs(j - player.getSpecialWorldJ());

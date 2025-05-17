@@ -12,4 +12,11 @@ public class DialogUtils {
         alert.showAndWait();
     }
 
+    public static void notYourTurn(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("ALO KUD SI KRENUO");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

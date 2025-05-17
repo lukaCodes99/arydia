@@ -23,6 +23,7 @@ public class MainController {
     private OpenWorld openWorld;
     private MovementService movementService;
     private Player player;
+    private CharacterType playerTurn;
 
     public void initialize() {
         gameGrid.setPadding(new Insets(10));
@@ -33,7 +34,7 @@ public class MainController {
         Platform.runLater(() -> {
             if (ClientApplication.gameState.getOpenWorld() != null) {
                 OpenWorld newOpenWorld = ClientApplication.gameState.getOpenWorld();
-
+                playerTurn = ClientApplication.gameState.getPlayerTurn();
                 newOpenWorld = WorldGenerationUtil.recreateTileUIAndSetPlayerText(newOpenWorld, ClientApplication.gameState.getPlayers());
                 ClientApplication.gameState.setOpenWorld(newOpenWorld);
                 this.openWorld = newOpenWorld;
@@ -54,17 +55,23 @@ public class MainController {
 
     private EventHandler<? super MouseEvent> createTileHandler(int i, int j) {
         return event -> {
-            tileHandler(i, j);
-            movementService.moveToTileOpenWorld(openWorld.getTiles(), i, j);
+            if (player.getPlayerType() == playerTurn) {
+                tileHandler(i, j);
+                movementService.moveToTileOpenWorld(openWorld.getTiles(), i, j);
+            } else {
+                DialogUtils.notYourTurn("NIJE TVOJ RED!!!");
+            }
         };
     }
+
+    //TODO U SPECIAL WORLDOVIMA MI NE RADI VALIDACIJA kretanja, IZGLEDA DA SE OPET POJAVIO PROBLEM JER SAM PROSLIJEDIO PLAYERA ALI NE BI TO SMIO BITI PROBLEM!!!!!!!!!!!!!
     private void tileHandler(int i, int j) {
         System.out.println("Tile clicked: " + i + ", " + j);
-//        System.out.println("Player position: " + player.getX() + ", " + player.getY());
-//        if (Math.abs(j - player.getX()) > 1 || Math.abs(i - player.getY()) > 1) { //mora apsoluton jer nekad ide u rikverc
-//            DialogUtils.invalidMoveAlert("Invalid move, you can only move to adjacent tiles");
-//            throw new InvalidMoveException("Invalid move");
-//        }
+        //System.out.println("Player position: " + player.getX() + ", " + player.getY());
+        if (checkMoveInvalidOpenWorld(i,j,1)) { //mora apsoluton jer nekad ide u rikverc
+            DialogUtils.invalidMoveAlert("Invalid move, you can only move to adjacent tiles");
+            throw new InvalidMoveException("Invalid move");
+        }
 
 
         //TileType tileType = worlds.get(i + "," + j).getTiles()[0][0].getTileType();
@@ -85,5 +92,11 @@ public class MainController {
         this.player = player;
         movementService = new MovementService(player);
         //initializeOpenWorld();
+    }
+
+    private boolean checkMoveInvalidOpenWorld(int i, int j, int moveAbilityLevel) {
+
+        return (Math.abs(i - player.getOpenWorldI()) > moveAbilityLevel
+                || (Math.abs(j - player.getOpenWorldJ()) > moveAbilityLevel));
     }
 }
