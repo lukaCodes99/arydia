@@ -69,10 +69,10 @@ public class MovementService {
 
     private boolean checkMoveValidSpecialWorld(int i, int j, Tile[][] specialWorldGrid) {
 
-        if (!specialWorldGrid[j][i].isActive()) return false;
+        if (!specialWorldGrid[i][j].isActive()) return false;
 
-        int deltaX = Math.abs(i - player.getOpenWorldI());
-        int deltaY = Math.abs(j - player.getOpenWorldJ());
+        int deltaX = Math.abs(i - player.getSpecialWorldI());
+        int deltaY = Math.abs(j - player.getSpecialWorldJ());
 
         if (deltaX > player.getMoveAbilityLevel() || deltaY > player.getMoveAbilityLevel()) {
             return false;

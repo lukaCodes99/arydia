@@ -2,17 +2,17 @@ package hr.tvz.arydia.server.controller;
 
 
 import hr.tvz.arydia.server.model.Location;
-import hr.tvz.arydia.server.service.MovementService;
 import hr.tvz.arydia.server.model.Player;
 import hr.tvz.arydia.server.model.Tile;
 import hr.tvz.arydia.server.model.World;
+import hr.tvz.arydia.server.service.MovementService;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
-public class BattleWorldController {
+public class ExplorationWorldController {
 
     @FXML
     private GridPane gameGrid;
@@ -23,9 +23,8 @@ public class BattleWorldController {
 
     private MovementService moveService;
 
-    public void setWorld(World world, Player player) {//ne prosljeđujem igrača jer se kosi logika za invalid move
+    public void setWorld(World world, Player player) {
         this.world = world;
-
 //        this.player = new Player();
 //        this.player.setName(player.getName());
 //        this.player.setMoveAbilityLevel(player.getMoveAbilityLevel());
@@ -34,7 +33,7 @@ public class BattleWorldController {
         this.player = player;
 
         this.moveService = new MovementService(this.player);
-        initializeBattleWorld();
+        initializeExplorationWorld();
     }
 
     //ovo je prije pozvano tak ta moja inicijalizacija ide poslje kroz setter, možda može kroz konstruktor, nez
@@ -45,10 +44,8 @@ public class BattleWorldController {
 
     }
 
-    private void initializeBattleWorld() {
-        if (world == null) {
-            throw new IllegalStateException("World is not set!");
-        }
+    private void initializeExplorationWorld() {
+
         Tile[][] tiles = world.getTiles();
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
@@ -66,4 +63,5 @@ public class BattleWorldController {
     private EventHandler<? super MouseEvent> createTileClickHandler(int i, int j) {
         return event -> moveService.moveToTileSpecialWorld(world.getTiles(), i, j);
     }
+
 }

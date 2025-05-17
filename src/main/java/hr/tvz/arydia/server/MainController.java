@@ -1,9 +1,7 @@
 package hr.tvz.arydia.server;
 
 import exception.InvalidMoveException;
-import hr.tvz.arydia.server.model.OpenWorld;
-import hr.tvz.arydia.server.model.Player;
-import hr.tvz.arydia.server.model.TileType;
+import hr.tvz.arydia.server.model.*;
 import hr.tvz.arydia.server.service.MovementService;
 import hr.tvz.arydia.server.thread.PlayerOneServerThread;
 import hr.tvz.arydia.server.util.DialogUtils;
@@ -56,28 +54,31 @@ public class MainController {
 
     private EventHandler<? super MouseEvent> createTileHandler(int i, int j) {
         return event -> {
-            //tileHandler(i, j);
+            tileHandler(i, j);
             movementService.moveToTileOpenWorld(openWorld.getTiles(), i, j);
         };
     }
-//    private void tileHandler(int i, int j) {
-//        System.out.println("Tile clicked: " + i + ", " + j);
+    private void tileHandler(int i, int j) {
+        System.out.println("Tile clicked: " + i + ", " + j);
 //        System.out.println("Player position: " + player.getX() + ", " + player.getY());
 //        if (Math.abs(j - player.getX()) > 1 || Math.abs(i - player.getY()) > 1) { //mora apsoluton jer nekad ide u rikverc
 //            DialogUtils.invalidMoveAlert("Invalid move, you can only move to adjacent tiles");
 //            throw new InvalidMoveException("Invalid move");
 //        }
-//
-//
-//        //TileType tileType = worlds.get(i + "," + j).getTiles()[0][0].getTileType();
-//        if (openWorldGrid[i][j].getTileType().equals(TileType.BATTLE)) {
-//            WorldHandlerUtil.handleWorldClick(worlds.get(i + "," + j), TileType.BATTLE.name(), player);
-//        } else if (openWorldGrid[i][j].getTileType().equals(TileType.EXPLORATION)) {
-//            WorldHandlerUtil.handleWorldClick(worlds.get(i + "," + j), TileType.EXPLORATION.name(), player);
-//        } else if (openWorldGrid[i][j].getTileType().equals(TileType.OPEN_WORLD)) {
-//            openWorldGrid[i][j].setTileType(worlds.get(i + "," + j).getTiles()[0][0].getTileType()); //dobar side-effect moram double click da se otvori novi svijet
-//        }
-//    }
+
+
+        //TileType tileType = worlds.get(i + "," + j).getTiles()[0][0].getTileType();
+        Tile tile = openWorld.getTile(i, j);
+        SpecialWorld specialWorld = openWorld.getSpecialWorld(i,j);
+        if (tile.getTileType().equals(TileType.BATTLE)) {
+            WorldHandlerUtil.handleWorldClick(specialWorld, TileType.BATTLE.name(), player);
+        } else if (tile.getTileType().equals(TileType.EXPLORATION)) {
+            WorldHandlerUtil.handleWorldClick(specialWorld, TileType.EXPLORATION.name(), player);
+        } else if (tile.getTileType().equals(TileType.OPEN_WORLD)) {
+            tile.setTileType(specialWorld.getTiles()[0][0].getTileType()); //dobar side-effect moram double click da se otvori novi svijet
+        }
+
+    }
 
     //ovo ce se pozvat prije svega
     public void setPlayer(Player player) {
