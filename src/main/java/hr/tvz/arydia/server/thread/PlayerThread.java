@@ -2,6 +2,7 @@ package hr.tvz.arydia.server.thread;
 
 import hr.tvz.arydia.server.ClientApplication;
 import hr.tvz.arydia.server.MainController;
+import hr.tvz.arydia.server.manager.GameStateManager;
 import hr.tvz.arydia.server.model.CharacterType;
 import hr.tvz.arydia.server.model.GameState;
 import hr.tvz.arydia.server.model.Player;
@@ -10,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -27,6 +29,7 @@ public class PlayerThread {
     private ObjectOutputStream oos;
     private String gameChoice;
     private String playerName;
+    @Getter
     private CharacterType whoAmI;
     private Player player;
 
@@ -40,6 +43,9 @@ public class PlayerThread {
             oos.writeObject(gameChoice + "," + playerName);
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
+
+            GameStateManager.getInstance(this);
+
 
         } catch (IOException e) {
             System.err.println("Error setting up connection: " + e.getMessage());
@@ -55,7 +61,11 @@ public class PlayerThread {
                         ClientApplication.gameState = newGameState;
                         gameState = newGameState;
                         setInitialWhoAmI(gameState.getPlayers());
-                        System.out.println("Received game state: " + gameState);
+                        System.out.println("whoAmI: " + whoAmI);
+                        // Update GameStateManager before loading the screen
+                        GameStateManager.getInstance(this).updateGameState(newGameState);
+                        
+                        //System.out.println("Received game state: " + gameState);
                         loadMainScreen();
                     } else {
                         System.out.println("Received unknown object: " + receivedObject);
@@ -68,8 +78,10 @@ public class PlayerThread {
     }
 
     private void setInitialWhoAmI(List<Player> players) {
+        System.out.println("Setting initial whoAmI");
         for (Player player : players) {
             if (player.getName().equals(playerName)) {
+                System.out.println("true");
                 this.whoAmI = player.getPlayerType();
                 this.player = player;
                 break;

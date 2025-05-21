@@ -49,55 +49,59 @@ public class MovementService {
 
     public void moveToTileSpecialWorld(Tile[][] specialWorldGrid, int i, int j) {
         //int moveAbilityLevel = player.getMoveAbilityLevel();
-        if(checkMoveInvalidSpecialWorld(i, j, specialWorldGrid)) {
-            DialogUtils.invalidMoveAlert("Invalid move, move exceeds your ability level or tile inactive");
+        if(!checkMoveValidSpecialWorld(i, j, specialWorldGrid)) {
+            //DialogUtils.invalidMoveAlert("Invalid move, move exceeds your ability level or tile inactive");
             throw new InvalidMoveException("Invalid move in special world");
         }
         System.out.printf("player type: %s\n", player.getPlayerType());
         System.out.println(player.getSpecialWorldI() +" "+ player.getSpecialWorldJ()
         +" swl"+ player.getSpecialWorldLocation().toString()
         +" openworld "+ player.getOpenWorldI()+" "+ player.getOpenWorldJ());
+
+
         if (player.getSpecialWorldI() != i || player.getSpecialWorldJ() != j) {
 
-            Tile oldTile = specialWorldGrid[player.getSpecialWorldI()][player.getSpecialWorldJ()];
-            oldTile.setText("");
+            specialWorldGrid[player.getSpecialWorldI()][player.getSpecialWorldJ()].setText("");
 
             player.setSpecialWorldLocation(new Location(i, j));
 
             //System.out.println(player.getX() + " " + player.getY());
+            //ime na novom tileu
+            specialWorldGrid[player.getSpecialWorldI()][player.getSpecialWorldJ()].setText(player.getName());
 
-            Tile newTile = specialWorldGrid[player.getSpecialWorldI()][player.getSpecialWorldJ()];
-            newTile.setText(player.getName());
         }
     }
 
-    private boolean checkMoveInvalidSpecialWorld(int i, int j, Tile[][] specialWorldGrid) {
+    private boolean checkMoveValidSpecialWorld(int newI, int newJ, Tile[][] specialWorldGrid) {
 
-        if (!specialWorldGrid[i][j].isActive()) {
-            System.out.println(specialWorldGrid[i][j].isActive());
+        if (!specialWorldGrid[newI][newJ].isActive()) {
+            System.out.println(specialWorldGrid[newI][newJ].isActive());
             return false;
         }
 
-        int deltaX = Math.abs(i - player.getSpecialWorldI());
-        int deltaY = Math.abs(j - player.getSpecialWorldJ());
+        int deltaI = Math.abs(newI - player.getSpecialWorldI());
+        int deltaJ = Math.abs(newJ - player.getSpecialWorldJ());
 
-        if (deltaX > player.getMoveAbilityLevel() || deltaY > player.getMoveAbilityLevel()) {
+        if (deltaI > player.getMoveAbilityLevel() || deltaJ > player.getMoveAbilityLevel()) {
             return false;
         }
 
-        if (deltaX > 1 || deltaY > 1) {
-            int stepX = Integer.compare(i, player.getSpecialWorldI()); //malo gpt lijevo desno
-            int stepY = Integer.compare(j, player.getSpecialWorldJ()); //gore dole
+        if (deltaI > 0 || deltaJ > 0) {
+            int stepI = Integer.compare(newI, player.getSpecialWorldI()); //malo gpt, vraca u kojem smjeru se ide zapravo
+            //vrijednosti -1,0,1 i to nam je korak po koliko idemo gore dolje lijevo desno
 
-            int currentX = player.getSpecialWorldI() + stepX;
-            int currentY = player.getSpecialWorldJ() + stepY;
+            int stepJ = Integer.compare(newJ, player.getSpecialWorldJ()); //gore dole
 
-            while (currentX != i || currentY != j) {
-                if (!specialWorldGrid[currentY][currentX].isActive()) {
+
+            int currentX = player.getSpecialWorldI() + stepI;
+            int currentY = player.getSpecialWorldJ() + stepJ;
+
+            while (currentX != newI || currentY != newJ) {
+                if (!specialWorldGrid[currentX][currentY].isActive()) {
                     return false;
                 }
-                currentX += stepX;
-                currentY += stepY;
+                currentX += stepI;
+                currentY += stepJ;
             }
         }
 

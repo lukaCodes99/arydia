@@ -1,48 +1,47 @@
 package hr.tvz.arydia.server.util;
 
-
 import hr.tvz.arydia.server.controller.BattleWorldController;
 import hr.tvz.arydia.server.controller.ExplorationWorldController;
 import hr.tvz.arydia.server.model.Player;
-import hr.tvz.arydia.server.model.World;
+import hr.tvz.arydia.server.model.SpecialWorld;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class WorldHandlerUtil {
+import java.io.IOException;
 
-    public static void handleWorldClick(World world, String worldType, Player player) {
-        if (world != null) {
+public class WorldHandlerUtil {
+    public static void handleWorldClick(SpecialWorld world, String worldType, Player player, int i, int j) {
+        Platform.runLater(() -> {
             try {
                 FXMLLoader loader = new FXMLLoader();
-                String fxmlFile = "";
-
-                if ("BATTLE".equals(worldType)) {
-                    fxmlFile = "/hr/tvz/arydia/server/battle-world-controller.fxml";
-                } else if ("EXPLORATION".equals(worldType)) {
-                    fxmlFile = "/hr/tvz/arydia/server/exploration-world-controller.fxml";
-                }
-
-                loader.setLocation(WorldHandlerUtil.class.getResource(fxmlFile));
-                Scene scene = new Scene(loader.load());
-
-                if ("BATTLE".equals(worldType)) {
-                    BattleWorldController controller = loader.getController();
-                    controller.setWorld(world, player);
-                } else if ("EXPLORATION".equals(worldType)) {
-                    ExplorationWorldController controller = loader.getController();
-                    controller.setWorld(world, player);
-                }
-
+                String fxmlPath = "/hr/tvz/arydia/server/" + 
+                    (worldType.equals("BATTLE") ? "battle" : "exploration") + 
+                    "-world-controller.fxml";
+                loader.setLocation(WorldHandlerUtil.class.getResource(fxmlPath));
+                Parent root = loader.load();
                 Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.setTitle(worldType + " WORLD - " + player.getName());
-                System.out.printf("%s: %s\n", worldType, player.getName());
+                
+                // Get controller and set the world
+                if (worldType.equals("BATTLE")) {
+                    BattleWorldController controller = loader.getController();
+                    controller.setWorld(world, player, i, j);
+                    stage.setOnCloseRequest(e -> controller.cleanup());
+                } else {
+                    ExplorationWorldController controller = loader.getController();
+                    controller.setWorld(world, player, i, j);
+                    stage.setOnCloseRequest(e -> controller.cleanup());
+                }
+                
+                stage.setTitle(worldType + " World");
+                stage.setScene(new Scene(root, 800, 800));
                 stage.show();
-            } catch (Exception e) {
+                
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        });
     }
 }
-
