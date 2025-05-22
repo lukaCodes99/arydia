@@ -1,5 +1,7 @@
 package hr.tvz.arydia.server.model;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 public enum CharacterType implements Serializable {

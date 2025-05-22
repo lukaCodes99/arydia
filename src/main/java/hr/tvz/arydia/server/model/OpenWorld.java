@@ -6,7 +6,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 @ToString
-//@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class OpenWorld extends World implements Serializable {
 
     private SpecialWorld[][] specialWorlds = new SpecialWorld[10][10];

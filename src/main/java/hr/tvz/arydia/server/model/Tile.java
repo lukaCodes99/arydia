@@ -7,12 +7,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"rect", "text", "container"})
 public class Tile implements Serializable {
 
 

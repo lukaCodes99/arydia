@@ -60,6 +60,7 @@ public class GameServer {
     }
 
     //lakse mi je da dijelim neke varijable ovako za ios i oos nego da ih stalno otvaram i zatvaram
+    //a i bolje je jer se javi AC greska
     private class ClientHandler implements Runnable{
         private final Socket clientSocket;
         private GameState gameState;
@@ -73,15 +74,18 @@ public class GameServer {
             this.playerNumber = playerNumber;
 
             try{
-                // Initialize input and output streams for the client
-                 ois = new ObjectInputStream(clientSocket.getInputStream());
-                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                 // Initialize input and output streams for the client
+                oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                oos.flush(); // Important!
+                ois = new ObjectInputStream(clientSocket.getInputStream());
             }
             catch (IOException e){
                 System.out.println("Error initializing streams: " + e.getMessage());
             }
         }
 
+
+        //TODO prilagoditi .equals da se ne šalje kad ne treba, možda čak bi trebalo i recreate napraviti prije usporedbe!
         @Override
         public void run() {
             try{
@@ -116,13 +120,20 @@ public class GameServer {
                 oos.flush();
 
                 while (!clientSocket.isClosed()) {
-                    gameState = (GameState) ois.readObject();
+                    System.out.println("trying to read object");
+                    //gameState = (GameState) ois.readObject();
+                    GameState newGameState = (GameState) ois.readObject();
+                    System.out.println("trying to read object");
                     System.out.println("Player " + playerNumber + " made a move. Broadcasting new game state...");
-                    broadcastGameState();
+                    if(!gameState.equals(newGameState)){
+                        System.out.println("unutar not equals");
+                        gameState = newGameState;
+                        broadcastGameState();
+                    }
                 }
             }
             catch (IOException | ClassNotFoundException e){
-                System.out.println("Error handling client: " + e.getMessage());
+                System.out.println("Error handling client: " + e);
             }
         }
 
@@ -141,6 +152,7 @@ public class GameServer {
         private void broadcastGameState() {
             try {
                 broadcastCounter++;
+                System.out.println("boardcastCounter: " + broadcastCounter);
                 if (broadcastCounter == 3) {
                     gameState.changePlayerTurn();
                     broadcastCounter = 0;
@@ -162,7 +174,8 @@ public class GameServer {
     //TODO sljedeće bi trebalo napraviti da je while petlja i onda već mislim da bi mogao prijeći na klijenta koji će morati upisati ime i reći što želi, prije toga nema spajanja! --done
     //TODO vidjeti jel možda treba imena threadova da ih znamo razlikovati iako mislim da ne treba --- DONE napravljena 2 client handlera
     //TODO KATASTROFA, NE PUNI SE DOBRO STATE!!!! PRAZNI SU CONTAINERI, TREBA VIDJETI PUNJENJE --- DONE dobro se pune ali ne mogu se serijalizirati tako da se mora napraviti čitanje
-    //TODO povezati da klijen zna tko je on! player 1 ili player 2
+    //TODO povezati da klijen zna tko je on! player 1 ili player 2 --- done
+    //TODO napraviti kad se primi novi game state da se broadcasta! --dobro se BC-a za sad ali divlja jedno triggera drugo u krug
 
     public static void main(String[] args){
         GameServer gameServer = new GameServer();

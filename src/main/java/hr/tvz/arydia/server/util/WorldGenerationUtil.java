@@ -35,7 +35,7 @@ public class WorldGenerationUtil {
                 }
                 openWorld.setTile(i, j, new Tile(TileType.OPEN_WORLD, active));
                 active = !active;
-                System.out.println(openWorld.getTile(i,j).toString());
+                //System.out.println(openWorld.getTile(i,j).toString());
             }
         }
         openWorld.setTile(0,0,new Tile(TileType.EXPLORATION, true));

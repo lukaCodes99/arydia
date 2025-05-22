@@ -21,9 +21,6 @@ import java.util.List;
 
 public class PlayerThread {
 
-    public static final String HOST = "localhost";
-    public static final int PORT = 1989;
-    private GameState gameState;
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
@@ -58,9 +55,10 @@ public class PlayerThread {
                 while (socket.isConnected()) {
                     Object receivedObject = ois.readObject();
                     if (receivedObject instanceof GameState newGameState) {
-                        ClientApplication.gameState = newGameState;
-                        gameState = newGameState;
-                        setInitialWhoAmI(gameState.getPlayers());
+                        //    ClientApplication.gameState = newGameState;
+//    gameState = newGameState;
+                        if (whoAmI == null) setInitialWhoAmI(newGameState.getPlayers());
+
                         System.out.println("whoAmI: " + whoAmI);
                         // Update GameStateManager before loading the screen
                         GameStateManager.getInstance(this).updateGameState(newGameState);
@@ -76,6 +74,8 @@ public class PlayerThread {
             }
         }).start();
     }
+
+
 
     private void setInitialWhoAmI(List<Player> players) {
         System.out.println("Setting initial whoAmI");
@@ -108,9 +108,9 @@ public class PlayerThread {
     }
 
     public void sendGameState(GameState gameState) {
+        //System.out.println("Sending game state: " + gameState);
         try {
-            if (socket != null && !socket.isClosed()) {
-                oos = new ObjectOutputStream(socket.getOutputStream());
+            if (socket != null && !socket.isClosed() && oos != null) {
                 oos.writeObject(gameState);
                 oos.flush();
             }
