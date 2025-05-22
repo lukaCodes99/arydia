@@ -1,6 +1,6 @@
 package hr.tvz.arydia.server.service;
 
-import exception.InvalidMoveException;
+import hr.tvz.arydia.server.exception.InvalidMoveException;
 import hr.tvz.arydia.server.model.Location;
 import hr.tvz.arydia.server.model.Player;
 import hr.tvz.arydia.server.model.Tile;

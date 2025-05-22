@@ -1,6 +1,6 @@
 package hr.tvz.arydia.server;
 
-import exception.InvalidMoveException;
+import hr.tvz.arydia.server.exception.InvalidMoveException;
 import hr.tvz.arydia.server.manager.GameStateManager;
 import hr.tvz.arydia.server.model.*;
 import hr.tvz.arydia.server.service.MovementService;

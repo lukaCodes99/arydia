@@ -1,4 +1,4 @@
-package exception;
+package hr.tvz.arydia.server.exception;
 
 public class InvalidMoveException extends RuntimeException {
     public InvalidMoveException(String message) {
