@@ -20,18 +20,23 @@ public class MovementService {
         }
         if (player.getOpenWorldI() != i || player.getOpenWorldJ() != j) {
 
-            Tile oldTile = openWorldGrid[player.getOpenWorldI()][player.getOpenWorldJ()];
-            oldTile.setText("");
+
 
             //Location location = new Location(i, j);
             player.setOpenWorldLocation(new Location(i, j));
 
             //System.out.println(player.getX() + " " + player.getY());
 
-            Tile newTile = openWorldGrid[player.getOpenWorldI()][player.getOpenWorldJ()];
-            newTile.setText(player.getName());
+            //Tile newTile = openWorldGrid[player.getOpenWorldI()][player.getOpenWorldJ()];
+            //newTile.setText(player.getName());
         }
     }
+
+    //Tile oldTile = openWorldGrid[player.getOpenWorldI()][player.getOpenWorldJ()];
+    //String newText = oldTile.getText().getText().replace(player.getName(), "").trim();
+    //System.out.println("old tile text: " + oldTile.getText().getText());
+    //System.out.println("new tile text: " + newText);
+    //oldTile.setText(newText);
 //tu su problem dijagonale odnosno smije samo u pločice do trenutne
     private boolean checkMoveInvalidOpenWorld(int i, int j, int moveAbilityLevel) {
         //return !((i - player.getOpenWorldI() > moveAbilityLevel) || (j - player.getOpenWorldJ() <= moveAbilityLevel));

@@ -67,6 +67,7 @@ public class GameServer {
         private final int playerNumber;
         private ObjectInputStream ois;
         private ObjectOutputStream oos;
+        boolean initalBroadcast = true;
 
         public ClientHandler(Socket clientSocket, GameState gameState, int playerNumber){
             this.clientSocket = clientSocket;
@@ -94,9 +95,12 @@ public class GameServer {
                 String gameStateChoice = firstContact.split(",")[0];
                 String playerName = firstContact.split(",")[1];
 
+
                 if ("new".equalsIgnoreCase(gameStateChoice)) {
                     newWorldInThread(playerName);
-
+//                    oos.writeObject(gameState);
+//                    oos.flush();
+                    broadcastGameState();
                 } else if ("load".equalsIgnoreCase(gameStateChoice)) {
                     if (new File("gameState/gameState.dat").exists()) {
                         GetLastGameStateThread getLastGameStateThread = new GetLastGameStateThread();
@@ -116,20 +120,30 @@ public class GameServer {
                     return;
                 }
 
-                oos.writeObject(gameState);
-                oos.flush();
+
 
                 while (!clientSocket.isClosed()) {
-                    System.out.println("trying to read object");
-                    //gameState = (GameState) ois.readObject();
-                    GameState newGameState = (GameState) ois.readObject();
-                    System.out.println("trying to read object");
-                    System.out.println("Player " + playerNumber + " made a move. Broadcasting new game state...");
-                    if(!gameState.equals(newGameState)){
-                        System.out.println("unutar not equals");
-                        gameState = newGameState;
-                        broadcastGameState();
+//                    System.out.println("trying to read object1111");
+//                    gameState = (GameState) ois.readObject();
+//                    //GameState newGameState = (GameState) ois.readObject();
+//                    System.out.println("trying to read object2222");
+//
+//                    //gameState = newGameState;
+//                    broadcastGameState();
+                    try {
+                        Object receivedObject = ois.readObject();
+                        if (receivedObject instanceof GameState newGameState) {
+                            gameState = newGameState;
+                            System.out.println("Received game state: " + gameState);
+                            broadcastGameState();
+                        } else {
+                            System.out.println("Received unknown object: " + receivedObject);
+                        }
+                    } catch (IOException | ClassNotFoundException e) {
+                        System.out.println("Error receiving data from client: " + e.getMessage());
                     }
+
+
                 }
             }
             catch (IOException | ClassNotFoundException e){
@@ -150,18 +164,25 @@ public class GameServer {
         }
         private int broadcastCounter = 0;
         private void broadcastGameState() {
+//            if(initalBroadcast) {
+//                System.out.println("first broadcast nothing happens");
+//                initalBroadcast = false;
+//                return;
+//            }
             try {
                 broadcastCounter++;
-                System.out.println("boardcastCounter: " + broadcastCounter);
+                System.out.println("Broadcast counter: " + broadcastCounter);
                 if (broadcastCounter == 3) {
                     gameState.changePlayerTurn();
                     broadcastCounter = 0;
                 }
-                if (playerOneHandler != null && playerOneHandler != this) {
+                if (playerOneHandler != null) {
+                    System.out.println("Broadcasting to player one");
                     playerOneHandler.oos.writeObject(gameState);
                     playerOneHandler.oos.flush();
                 }
-                if (playerTwoHandler != null && playerTwoHandler != this) {
+                if (playerTwoHandler != null) {
+                    System.out.println("Broadcasting to player two");
                     playerTwoHandler.oos.writeObject(gameState);
                     playerTwoHandler.oos.flush();
                 }
@@ -175,7 +196,7 @@ public class GameServer {
     //TODO vidjeti jel možda treba imena threadova da ih znamo razlikovati iako mislim da ne treba --- DONE napravljena 2 client handlera
     //TODO KATASTROFA, NE PUNI SE DOBRO STATE!!!! PRAZNI SU CONTAINERI, TREBA VIDJETI PUNJENJE --- DONE dobro se pune ali ne mogu se serijalizirati tako da se mora napraviti čitanje
     //TODO povezati da klijen zna tko je on! player 1 ili player 2 --- done
-    //TODO napraviti kad se primi novi game state da se broadcasta! --dobro se BC-a za sad ali divlja jedno triggera drugo u krug
+    //TODO napraviti kad se primi novi game state da se broadcasta! --dobro se BC-a za sad ali divlja jedno triggera drugo u krug, dobro se broadcasta ali ne kad se spoji igrač novi!
 
     public static void main(String[] args){
         GameServer gameServer = new GameServer();

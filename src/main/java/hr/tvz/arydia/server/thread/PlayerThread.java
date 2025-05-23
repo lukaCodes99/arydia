@@ -51,20 +51,24 @@ public class PlayerThread {
 //wittcode kaže da s obzirom da je blokirajuće najbolje je da napravimo novi thread tako da taj poseban thread kad se spoji čeka na promjene
     public void connectToServer() {
         new Thread(() -> {
+            boolean gameStarted = false;
             try {
                 while (socket.isConnected()) {
                     Object receivedObject = ois.readObject();
                     if (receivedObject instanceof GameState newGameState) {
                         //    ClientApplication.gameState = newGameState;
-//    gameState = newGameState;
+                        //    gameState = newGameState;
                         if (whoAmI == null) setInitialWhoAmI(newGameState.getPlayers());
 
                         System.out.println("whoAmI: " + whoAmI);
                         // Update GameStateManager before loading the screen
-                        GameStateManager.getInstance(this).updateGameState(newGameState);
-                        
+                        GameStateManager.getInstance(this).processServerUpdate(newGameState);
+
                         //System.out.println("Received game state: " + gameState);
-                        loadMainScreen();
+                        if(!gameStarted) {
+                            loadMainScreen();
+                            gameStarted = true;
+                        }
                     } else {
                         System.out.println("Received unknown object: " + receivedObject);
                     }
@@ -106,6 +110,7 @@ public class PlayerThread {
             }
         });
     }
+
 
     public void sendGameState(GameState gameState) {
         //System.out.println("Sending game state: " + gameState);

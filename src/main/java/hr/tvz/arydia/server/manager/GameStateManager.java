@@ -21,7 +21,8 @@ public class GameStateManager {
     private final PlayerThread playerThread;
     @Setter
     private MainController mainController;
-    
+    private boolean isProcessingServerUpdate = false;
+
     // Maps to track controllers and their associated worlds
     private final Map<BattleWorldController, Location> battleControllers;
     private final Map<ExplorationWorldController, Location> explorationControllers;
@@ -72,7 +73,7 @@ public class GameStateManager {
         Platform.runLater(() -> {
             // Update main controller
             if (mainController != null) {
-                mainController.refreshGrid(newState);
+                mainController.refreshGrid(currentState);
             }
             
             // Update battle world controllers
@@ -91,9 +92,22 @@ public class GameStateManager {
                 }
             });
         });
-        playerThread.sendGameState(currentState);
+        if (!isProcessingServerUpdate) {
+            playerThread.sendGameState(currentState);
+        }
+
 
     }
+
+    public void processServerUpdate(GameState newState) {
+        isProcessingServerUpdate = true;
+        try {
+            updateGameState(newState);
+        } finally {
+            isProcessingServerUpdate = false;
+        }
+    }
+
 
     public void updateGameStateAfterMove(Player movedPlayer) {
         // Update the player in the current state
@@ -105,9 +119,6 @@ public class GameStateManager {
                 break;
             }
         }
-
-        // Change turn
-        //currentState.changePlayerTurn();
 
         // This will trigger UI updates and send state to server
         updateGameState(currentState);

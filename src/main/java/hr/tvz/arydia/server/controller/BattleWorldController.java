@@ -1,6 +1,7 @@
 package hr.tvz.arydia.server.controller;
 
 
+import hr.tvz.arydia.server.exception.InvalidMoveException;
 import hr.tvz.arydia.server.manager.GameStateManager;
 import hr.tvz.arydia.server.model.*;
 import hr.tvz.arydia.server.service.MovementService;
@@ -65,7 +66,13 @@ public class BattleWorldController {
                 DialogUtils.notYourTurn("NIJE TVOJ RED!!!");
                 return;
             }
-            moveService.moveToTileSpecialWorld(world.getTiles(), i, j);
+            try{
+                moveService.moveToTileSpecialWorld(world.getTiles(), i, j);
+                gameStateManager.updateGameStateAfterMove(player);
+            }
+            catch (InvalidMoveException e) {
+                DialogUtils.invalidMoveAlert("Invalid move, move exceeds your ability level or tile inactive");
+            }
         };
     }
 
@@ -75,7 +82,7 @@ public class BattleWorldController {
             return;
         }
 
-        gameGrid.getChildren().clear();
+        //gameGrid.getChildren().clear();
         Tile[][] tiles = updatedWorld.getTiles();
 
         for (int i = 0; i < tiles.length; i++) {

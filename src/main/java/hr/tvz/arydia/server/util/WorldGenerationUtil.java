@@ -75,6 +75,7 @@ public class WorldGenerationUtil {
             }
         }
         for(Player player : players) {
+            System.out.println("player "+ player.getPlayerType() + " " + player.getOpenWorldLocation().getI() + " " + player.getOpenWorldLocation().getJ());
             int i = player.getOpenWorldLocation().getI();
             int j = player.getOpenWorldLocation().getJ();
             if(newOpenWorld.getTile(i,j).getText().getText().isEmpty())

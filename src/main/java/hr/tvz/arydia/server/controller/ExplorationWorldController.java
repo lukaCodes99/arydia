@@ -62,7 +62,7 @@ public class ExplorationWorldController {
             return;
         }
         
-        gameGrid.getChildren().clear();
+        //gameGrid.getChildren().clear();
         Tile[][] tiles = updatedWorld.getTiles();
         
         for (int i = 0; i < tiles.length; i++) {

@@ -40,8 +40,8 @@ public class MainController {
     }
 
     public void refreshGrid(GameState newState) {
-        this.openWorld = newState.getOpenWorld();
         gameGrid.getChildren().clear();
+        this.openWorld = newState.getOpenWorld();
 
         for (int i = 0; i < WORLD_SIZE; i++) {
             for (int j = 0; j < WORLD_SIZE; j++) {
@@ -64,20 +64,39 @@ public class MainController {
         }
 
         try {
-            if (checkMoveInvalidOpenWorld(i, j, 1)) {
-                DialogUtils.invalidMoveAlert("Invalid move, you can only move to adjacent tiles");
-                throw new InvalidMoveException("Invalid move");
-            }
+//            if (checkMoveInvalidOpenWorld(i, j, 1)) {
+//                DialogUtils.invalidMoveAlert("Invalid move, you can only move to adjacent tiles");
+//                throw new InvalidMoveException("Invalid move");
+//            }
 
             tileHandler(i, j);
             movementService.moveToTileOpenWorld(openWorld.getTiles(), i, j);
-            
-            // Update game state after successful move
             GameState currentState = gameStateManager.getCurrentState();
+            currentState.setOpenWorld(openWorld);
+            updatePlayerAfterMove(currentState);
+
+            // Update game state after successful move
+            //GameState currentState = gameStateManager.getCurrentState();
             //currentState.changePlayerTurn();
+
             gameStateManager.updateGameState(currentState);
         } catch (InvalidMoveException e) {
             // Exception already handled by dialog
+        }
+    }
+
+    public void updatePlayerAfterMove(GameState currentState) {
+        System.out.println("Players before update: " + currentState.getPlayers().size());
+        for (Player p : currentState.getPlayers()) {
+            if (p.getPlayerType() == player.getPlayerType()) {
+                // Update player's locations
+                p.setOpenWorldLocation(player.getOpenWorldLocation());
+                p.setSpecialWorldLocation(player.getSpecialWorldLocation());
+            }
+        }
+        System.out.println("Players after update: " + currentState.getPlayers().size());
+        for (Player p : currentState.getPlayers()) {
+            System.out.println("Player in list: " + p.getPlayerType());
         }
     }
 
@@ -92,8 +111,8 @@ public class MainController {
         }
     }
 
-    private boolean checkMoveInvalidOpenWorld(int i, int j, int moveAbilityLevel) {
-        return (Math.abs(i - player.getOpenWorldI()) > moveAbilityLevel
-                || (Math.abs(j - player.getOpenWorldJ()) > moveAbilityLevel));
-    }
+//    private boolean checkMoveInvalidOpenWorld(int i, int j, int moveAbilityLevel) {
+//        return (Math.abs(i - player.getOpenWorldI()) > moveAbilityLevel
+//                || (Math.abs(j - player.getOpenWorldJ()) > moveAbilityLevel));
+//    }
 }
