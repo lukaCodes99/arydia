@@ -21,4 +21,14 @@ public class WelcomeController {
             System.out.println("Please enter a valid name.");
         }
     }
+
+    @FXML
+    public void loadGame(ActionEvent actionEvent) throws IOException {
+        String playerName = playerNameField.getText();
+        if (playerName != null && !playerName.isEmpty()) {
+            ClientApplication.startGame("load", playerName);
+        } else {
+            System.out.println("Please enter a valid name.");
+        }
+    }
 }

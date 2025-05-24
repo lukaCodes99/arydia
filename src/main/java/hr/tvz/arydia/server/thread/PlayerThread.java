@@ -57,6 +57,7 @@ public class PlayerThread {
             try {
                 while (socket.isConnected()) {
                     Object receivedObject = ois.readObject();
+                    System.out.println(receivedObject);
                     if (receivedObject instanceof GameState) {
                         //    ClientApplication.gameState = newGameState;
                         //    gameState = newGameState;

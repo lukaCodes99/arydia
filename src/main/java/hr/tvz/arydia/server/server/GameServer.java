@@ -113,9 +113,12 @@ public class GameServer {
                         GetLastGameStateThread getLastGameStateThread = new GetLastGameStateThread();
                         Thread starter = new Thread(getLastGameStateThread);
                         starter.start();
+                        if(starter.isAlive()) System.out.println("Waiting for last game state...");
+                        starter.join();
                         gameState = getLastGameStateThread.getLastGameState();
                         gameState.getPlayers().get(playerNumber-1).setName(playerName); //u slučaju da promijeni ime, ostalo mu je sve isto
                         System.out.println("Player " + playerNumber + " loaded an existing game.");
+                        broadcastGameState();
                     } else {
                         newWorldInThread(playerName);
                         System.out.println("No saved game found. A new game has been created.");
@@ -127,33 +130,12 @@ public class GameServer {
                     return;
                 }
 
-
-
                 while (!clientSocket.isClosed()) {
-                    System.out.println("trying to read object1111");
                     gameState = (GameState) ois.readObject();
-                    //GameState newGameState = (GameState) ois.readObject();
-                    System.out.println("trying to read object2222");
-
-                    //gameState = newGameState;
                     broadcastGameState();
-//                    try {
-//                        Object receivedObject = ois.readObject();
-//                        if (receivedObject instanceof GameState newGameState) {
-//                            gameState = newGameState;
-//                            System.out.println("Received game state: " + gameState);
-//                            broadcastGameState();
-//                        } else {
-//                            System.out.println("Received unknown object: " + receivedObject);
-//                        }
-//                    } catch (IOException | ClassNotFoundException e) {
-//                        System.out.println("Error receiving data from client: " + e.getMessage());
-//                    }
-//
-
                 }
             }
-            catch (IOException | ClassNotFoundException e){
+            catch (IOException | ClassNotFoundException | InterruptedException e){
                 System.out.println("Error handling client: " + e);
             }
         }
@@ -186,12 +168,14 @@ public class GameServer {
                 if (playerOneHandler != null) {
                     System.out.println("Broadcasting to player one");
                     System.out.println("game state in broadcast111: " + gameState.getPlayers());
+                    playerOneHandler.oos.reset(); //ovaj oos ima neki cache i zato nije radio kako se spada!! ako se ne reseta
                     playerOneHandler.oos.writeObject(gameState);
                     playerOneHandler.oos.flush();
                 }
                 if (playerTwoHandler != null) {
                     System.out.println("Broadcasting to player two");
                     System.out.println("game state in broadcast222: " + gameState.getPlayers());
+                    playerTwoHandler.oos.reset();
                     playerTwoHandler.oos.writeObject(gameState);
                     playerTwoHandler.oos.flush();
                 }
@@ -205,7 +189,8 @@ public class GameServer {
     //TODO vidjeti jel možda treba imena threadova da ih znamo razlikovati iako mislim da ne treba --- DONE napravljena 2 client handlera
     //TODO KATASTROFA, NE PUNI SE DOBRO STATE!!!! PRAZNI SU CONTAINERI, TREBA VIDJETI PUNJENJE --- DONE dobro se pune ali ne mogu se serijalizirati tako da se mora napraviti čitanje
     //TODO povezati da klijen zna tko je on! player 1 ili player 2 --- done
-    //TODO napraviti kad se primi novi game state da se broadcasta! --dobro se BC-a za sad ali divlja jedno triggera drugo u krug, dobro se broadcasta ali ne kad se spoji igrač novi!
+    //TODO napraviti kad se primi novi game state da se broadcasta! --- done
+    //TODO implementirati load game
 
     public static void main(String[] args){
         GameServer gameServer = new GameServer();

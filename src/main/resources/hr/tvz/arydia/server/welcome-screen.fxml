@@ -16,5 +16,6 @@
 
     <Label text="Welcome to Arydia! Please enter your name:"/>
     <TextField fx:id="playerNameField" promptText="Enter your name"/>
-    <Button text="Start Game" onAction="#startGame"/>
+    <Button text="Start new game" onAction="#startGame"/>
+    <Button text="Load last Game" onAction="#loadGame"/>
 </VBox>

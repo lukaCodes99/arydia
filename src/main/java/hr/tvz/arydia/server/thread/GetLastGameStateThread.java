@@ -12,6 +12,7 @@ public class GetLastGameStateThread extends GameMoveThread implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("inside tun method");
         lastGameState = getLastGameStateFromFile();
         if (lastGameState != null) {
             System.out.println("Last game state retrieved successfully.");
@@ -21,7 +22,7 @@ public class GetLastGameStateThread extends GameMoveThread implements Runnable {
         }
     }
 
-    public synchronized GameState getLastGameState() {
+    public GameState getLastGameState() {
         return this.lastGameState;
     }
 }
