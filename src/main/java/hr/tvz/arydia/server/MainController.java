@@ -27,10 +27,10 @@ public class MainController {
         gameGrid.setVgap(5);
     }
 
-    public void setPlayer(Player player) {
+    public void setPlayer(Player player, GameStateManager gameStateManager) {
         this.player = player;
         this.movementService = new MovementService(player);
-        this.gameStateManager = GameStateManager.getInstance();
+        this.gameStateManager = gameStateManager;
         this.gameStateManager.setMainController(this);
         
         // Initial setup with current game state

@@ -26,23 +26,23 @@ public class GameStateManager {
     // Maps to track controllers and their associated worlds
     private final Map<BattleWorldController, Location> battleControllers;
     private final Map<ExplorationWorldController, Location> explorationControllers;
-    
+
     @Getter
     private CharacterType whoAmI;
 
-    private GameStateManager(PlayerThread playerThread) {
+    public GameStateManager(PlayerThread playerThread) {
         this.playerThread = playerThread;
         this.whoAmI = playerThread.getWhoAmI();
         this.battleControllers = new HashMap<>();
         this.explorationControllers = new HashMap<>();
     }
 
-    public static GameStateManager getInstance(PlayerThread playerThread) {
-        if (instance == null) {
-            instance = new GameStateManager(playerThread);
-        }
-        return instance;
-    }
+//    public static GameStateManager getInstance(PlayerThread playerThread) {
+//        if (instance == null) {
+//            instance = new GameStateManager(playerThread);
+//        }
+//        return instance;
+//    }
 
     public void addBattleController(BattleWorldController controller, int i, int j) {
         battleControllers.put(controller, new Location(i, j));
@@ -62,6 +62,7 @@ public class GameStateManager {
 
     public void updateGameState(GameState newState) {
         // Recreate UI elements
+        System.out.println("in method update game state " + newState.getPlayers());
         newState.setOpenWorld(WorldGenerationUtil.recreateTileUIAndSetPlayerText(
                 newState.getOpenWorld(),
                 newState.getPlayers()
@@ -75,7 +76,7 @@ public class GameStateManager {
             if (mainController != null) {
                 mainController.refreshGrid(currentState);
             }
-            
+
             // Update battle world controllers
             battleControllers.forEach((controller, location) -> {
                 SpecialWorld world = newState.getOpenWorld().getSpecialWorld(location.getI(), location.getJ());
@@ -83,7 +84,7 @@ public class GameStateManager {
                     controller.refreshGrid(world);
                 }
             });
-            
+
             // Update exploration world controllers
             explorationControllers.forEach((controller, location) -> {
                 SpecialWorld world = newState.getOpenWorld().getSpecialWorld(location.getI(), location.getJ());
@@ -96,10 +97,9 @@ public class GameStateManager {
             playerThread.sendGameState(currentState);
         }
 
-
     }
 
-    public void processServerUpdate(GameState newState) {
+    public synchronized void processServerUpdate(GameState newState) {
         isProcessingServerUpdate = true;
         try {
             updateGameState(newState);

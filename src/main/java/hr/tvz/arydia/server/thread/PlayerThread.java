@@ -29,6 +29,8 @@ public class PlayerThread {
     @Getter
     private CharacterType whoAmI;
     private Player player;
+    private GameStateManager gameStateManager;
+
 
 
     public PlayerThread(Socket clientSocket, String gameChoice, String playerName) {
@@ -40,8 +42,8 @@ public class PlayerThread {
             oos.writeObject(gameChoice + "," + playerName);
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
-
-            GameStateManager.getInstance(this);
+//vidjet cemo sto je sa whoamI
+            gameStateManager = new GameStateManager(this);
 
 
         } catch (IOException e) {
@@ -55,14 +57,16 @@ public class PlayerThread {
             try {
                 while (socket.isConnected()) {
                     Object receivedObject = ois.readObject();
-                    if (receivedObject instanceof GameState newGameState) {
+                    if (receivedObject instanceof GameState) {
                         //    ClientApplication.gameState = newGameState;
                         //    gameState = newGameState;
+                        GameState newGameState = (GameState) receivedObject;
                         if (whoAmI == null) setInitialWhoAmI(newGameState.getPlayers());
 
                         System.out.println("whoAmI: " + whoAmI);
+                        System.out.println("new game state players " + newGameState.getPlayers());
                         // Update GameStateManager before loading the screen
-                        GameStateManager.getInstance(this).processServerUpdate(newGameState);
+                        gameStateManager.processServerUpdate(newGameState);
 
                         //System.out.println("Received game state: " + gameState);
                         if(!gameStarted) {
@@ -99,7 +103,7 @@ public class PlayerThread {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/hr/tvz/arydia/server/hello-view.fxml"));
                 Parent root = loader.load(); //  ovo uvijek treba prvo pozvati!!
                 MainController controller = loader.getController();
-                controller.setPlayer(player);//zbog servisa
+                controller.setPlayer(player, gameStateManager);//zbog servisa
                 Stage stage = new Stage();
                 stage.setTitle("Arydia - "  + whoAmI + ": " + playerName);
                 stage.setScene(new Scene(root, 800, 800));

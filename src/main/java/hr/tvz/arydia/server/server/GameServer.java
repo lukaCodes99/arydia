@@ -50,6 +50,10 @@ public class GameServer {
                         playerTwoHandler = handler;
                     }
                     new Thread(handler).start();
+//                    if (numberOfPlayers == 2) {
+//                        // Notify player one about the updated game state
+//                        playerTwoHandler.broadcastGameState();
+//                    }
                 }
             }
             catch (IOException e){
@@ -79,6 +83,8 @@ public class GameServer {
                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 oos.flush(); // Important!
                 ois = new ObjectInputStream(clientSocket.getInputStream());
+
+
             }
             catch (IOException e){
                 System.out.println("Error initializing streams: " + e.getMessage());
@@ -86,7 +92,7 @@ public class GameServer {
         }
 
 
-        //TODO prilagoditi .equals da se ne šalje kad ne treba, možda čak bi trebalo i recreate napraviti prije usporedbe!
+
         @Override
         public void run() {
             try{
@@ -100,6 +106,7 @@ public class GameServer {
                     newWorldInThread(playerName);
 //                    oos.writeObject(gameState);
 //                    oos.flush();
+                    System.out.println("Player " + playerNumber + " created a new game.");
                     broadcastGameState();
                 } else if ("load".equalsIgnoreCase(gameStateChoice)) {
                     if (new File("gameState/gameState.dat").exists()) {
@@ -123,26 +130,26 @@ public class GameServer {
 
 
                 while (!clientSocket.isClosed()) {
-//                    System.out.println("trying to read object1111");
-//                    gameState = (GameState) ois.readObject();
-//                    //GameState newGameState = (GameState) ois.readObject();
-//                    System.out.println("trying to read object2222");
-//
-//                    //gameState = newGameState;
-//                    broadcastGameState();
-                    try {
-                        Object receivedObject = ois.readObject();
-                        if (receivedObject instanceof GameState newGameState) {
-                            gameState = newGameState;
-                            System.out.println("Received game state: " + gameState);
-                            broadcastGameState();
-                        } else {
-                            System.out.println("Received unknown object: " + receivedObject);
-                        }
-                    } catch (IOException | ClassNotFoundException e) {
-                        System.out.println("Error receiving data from client: " + e.getMessage());
-                    }
+                    System.out.println("trying to read object1111");
+                    gameState = (GameState) ois.readObject();
+                    //GameState newGameState = (GameState) ois.readObject();
+                    System.out.println("trying to read object2222");
 
+                    //gameState = newGameState;
+                    broadcastGameState();
+//                    try {
+//                        Object receivedObject = ois.readObject();
+//                        if (receivedObject instanceof GameState newGameState) {
+//                            gameState = newGameState;
+//                            System.out.println("Received game state: " + gameState);
+//                            broadcastGameState();
+//                        } else {
+//                            System.out.println("Received unknown object: " + receivedObject);
+//                        }
+//                    } catch (IOException | ClassNotFoundException e) {
+//                        System.out.println("Error receiving data from client: " + e.getMessage());
+//                    }
+//
 
                 }
             }
@@ -163,7 +170,7 @@ public class GameServer {
             starter.start();
         }
         private int broadcastCounter = 0;
-        private void broadcastGameState() {
+        private synchronized void broadcastGameState() {
 //            if(initalBroadcast) {
 //                System.out.println("first broadcast nothing happens");
 //                initalBroadcast = false;
@@ -178,11 +185,13 @@ public class GameServer {
                 }
                 if (playerOneHandler != null) {
                     System.out.println("Broadcasting to player one");
+                    System.out.println("game state in broadcast111: " + gameState.getPlayers());
                     playerOneHandler.oos.writeObject(gameState);
                     playerOneHandler.oos.flush();
                 }
                 if (playerTwoHandler != null) {
                     System.out.println("Broadcasting to player two");
+                    System.out.println("game state in broadcast222: " + gameState.getPlayers());
                     playerTwoHandler.oos.writeObject(gameState);
                     playerTwoHandler.oos.flush();
                 }
